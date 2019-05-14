@@ -38,6 +38,7 @@ class List extends React.Component {
         title: 'Base Image',
         dataIndex: 'labels.ranchervm-base-image',
         key: 'baseImage',
+        width: 300,
       }, {
         title: 'Size',
         dataIndex: 'size',
@@ -54,6 +55,7 @@ class List extends React.Component {
         title: ' Last Backup At',
         dataIndex: 'lastBackupAt',
         key: 'lastBackupAt',
+        width: 300,
         sorter: (a, b) => sortTable(a, b, 'lastBackupAt'),
         render: (text) => {
           return (
