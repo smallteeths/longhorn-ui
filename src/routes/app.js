@@ -49,7 +49,7 @@ const App = ({ children, dispatch, location, app }) => {
 }
 
 App.propTypes = {
-  children: PropTypes.element.isRequired,
+  children: PropTypes.array,
   app: PropTypes.object,
   location: PropTypes.object,
   dispatch: PropTypes.func,
