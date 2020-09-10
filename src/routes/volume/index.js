@@ -101,6 +101,7 @@ class Volume extends React.Component {
     const settings = this.props.setting.data
     const defaultReplicaCountSetting = settings.find(s => s.id === 'default-replica-count')
     const defaultDataLocalitySetting = settings.find(s => s.id === 'default-data-locality')
+    const defaultRevisionCounterSetting = settings.find(s => s.id === 'disable-revision-counter')
     const defaultNumberOfReplicas = defaultReplicaCountSetting !== undefined ? parseInt(defaultReplicaCountSetting.value, 10) : 3
     const replicaSoftAntiAffinitySetting = settings.find(s => s.id === 'replica-soft-anti-affinity')
     let replicaSoftAntiAffinitySettingValue = false
@@ -109,6 +110,7 @@ class Volume extends React.Component {
     }
     const defaultDataLocalityOption = defaultDataLocalitySetting && defaultDataLocalitySetting.definition && defaultDataLocalitySetting.definition.options ? defaultDataLocalitySetting.definition.options : []
     const defaultDataLocalityValue = defaultDataLocalitySetting && defaultDataLocalitySetting.value ? defaultDataLocalitySetting.value : 'disabled'
+    const defaultRevisionCounterValue = defaultRevisionCounterSetting && defaultRevisionCounterSetting.value ? defaultRevisionCounterSetting.value === 'true' : false
 
     const volumeFilterMap = {
       healthy: healthyVolume,
@@ -607,6 +609,7 @@ class Volume extends React.Component {
       nodeTags,
       defaultDataLocalityOption,
       defaultDataLocalityValue,
+      defaultRevisionCounterValue,
       diskTags,
       tagsLoading,
       hosts,
