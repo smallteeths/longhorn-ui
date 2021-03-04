@@ -88,6 +88,30 @@ function list({ loading, dataSource, engineImages, hosts, showAttachHost, showEn
     }
   }
 
+  const isAutomaticallyUpgradeEngine = (volume) => {
+    if (engineUpgradePerNodeLimit && engineUpgradePerNodeLimit.value !== '0') {
+      let defaultEngineImage = engineImages.find(engineImage => engineImage.default)
+      if (defaultEngineImage) {
+        return volume.engineImage !== defaultEngineImage.image
+      }
+      return false
+    }
+    return false
+  }
+
+  const statusUpgradingEngine = (volume) => {
+    let oldSize = volume && volume.controllers && volume.controllers[0] && volume.controllers[0].size ? volume.controllers[0].size : ''
+
+    // The condition for determining that an engine is being upgraded is that the non-DR volume status is not degraded and the volume size is not being expanding.
+    if (!volume.standby && volume.robustness !== 'degraded' && volume.size === oldSize && isAutomaticallyUpgradeEngine(volume)) {
+      let defaultEngineImage = engineImages.find(engineImage => engineImage.default)
+      let title = `${volume.name} volume enggine is being upgraded from ${volume.engineImage} to ${defaultEngineImage.image}`
+
+      return (<div><Tooltip title={title}><Icon type="sync" spin style={{ marginRight: 5 }} /></Tooltip></div>)
+    }
+    return ''
+  }
+
   const defaultImage = engineImages.find(image => image.default === true)
   let columns = [
     {
@@ -98,6 +122,7 @@ function list({ loading, dataSource, engineImages, hosts, showAttachHost, showEn
       sorter: (a, b) => sortTableState(a, b),
       render: (text, record) => {
         let upgrade = null
+
         const state = getHealthState(record.robustness)
         if (isVolumeImageUpgradable(record, defaultImage)) {
           const currentVersion = extractImageVersion(record.currentImage)
@@ -139,6 +164,7 @@ function list({ loading, dataSource, engineImages, hosts, showAttachHost, showEn
               {restoreProgress}
               {rebuildProgress}
             </div>
+            {statusUpgradingEngine(record)}
             {upgrade}
             {attchedNodeIsDown ? <Tooltip title={'The attached node is down'}><Icon className="faulted" style={{ transform: 'rotate(45deg)', marginRight: 5 }} type="api" /></Tooltip> : ''}
             {stateText}
