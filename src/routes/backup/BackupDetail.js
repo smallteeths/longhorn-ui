@@ -20,7 +20,7 @@ function Backup({ host, backup, volume, setting, backingImage, loading, location
   const backingImages = backingImage.data
   const defaultReplicaCountSetting = settings.find(s => s.id === 'default-replica-count')
   const defaultNumberOfReplicas = defaultReplicaCountSetting !== undefined ? parseInt(defaultReplicaCountSetting.value, 10) : 3
-  const currentBackUp = backupVolumes.filter((item) => { return item.id === queryString.parse(location.search).keyword })
+  const currentBackUp = backupVolumes.find((item) => { return item.id === queryString.parse(location.search).keyword })
   const backupVolumesProps = {
     backup: data,
     volumeList,
@@ -53,6 +53,7 @@ function Backup({ host, backup, volume, setting, backingImage, loading, location
             numberOfReplicas: defaultNumberOfReplicas,
             volumeName: record.volumeName,
             accessMode: currentVolume && currentVolume.accessMode ? currentVolume.accessMode : 'rwo',
+            backingImage: currentBackUp.backingImageName,
           },
         },
       })
@@ -127,7 +128,7 @@ function Backup({ host, backup, volume, setting, backingImage, loading, location
   const showDeleteConfirm = (record) => {
     confirm({
       title: 'Are you sure delete all the backups?',
-      content: 'If there is backup restore process in progress using the backups of this volume (including DR volumes), deleting the backup volume will result in restore failure and the volume in the restore process will become FAULTED. Are you sure you want to delete this backup volume?',
+      content: 'If there is backup restore process in progress using the backups of this volume (including DR volumes), deleteing the backup volume will result in restore failure and the volume in the restore process will become FAULTED. Are you sure you want to delete this backup volume?',
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
@@ -147,6 +148,7 @@ function Backup({ host, backup, volume, setting, backingImage, loading, location
       iops: 1000,
       baseImage,
       fromBackup: lastBackupUrl,
+      backingImage: currentBackUp ? currentBackUp.backingImageName : '',
     },
     nodeTags,
     diskTags,
@@ -195,10 +197,10 @@ function Backup({ host, backup, volume, setting, backingImage, loading, location
       <div style={{ position: 'absolute', top: '-50px', right: '20px', display: 'flex', justifyContent: 'flex-end', padding: '10px' }}>
         <DropOption
           menuOptions={[
-            { key: 'recovery', name: 'Create Disaster Recovery Volume', disabled: currentBackUp.length > 0 && !currentBackUp[0].lastBackupName },
+            { key: 'recovery', name: 'Create Disaster Recovery Volume', disabled: currentBackUp && !currentBackUp.lastBackupName },
             { key: 'deleteAll', name: 'Delete All Backups' },
           ]}
-          onMenuClick={e => handleMenuClick(currentBackUp[0], e)}
+          onMenuClick={e => handleMenuClick(currentBackUp, e)}
         />
       </div>
       <BackupList {...backupVolumesProps} />
