@@ -1,4 +1,4 @@
-import { create, deleteBackingImage, query, deleteDisksOnBackingImage } from '../services/backingImage'
+import { create, deleteBackingImage, query, deleteDisksOnBackingImage, uploadChunk } from '../services/backingImage'
 import { parse } from 'qs'
 import { wsChanges, updateState } from '../utils/websocket'
 import queryString from 'query-string'
@@ -46,10 +46,14 @@ export default {
     },
     *create({
       payload,
+      callback,
     }, { call, put }) {
       yield put({ type: 'hideCreateBackingImageModal' })
-      yield call(create, payload)
+      let resp = yield call(create, payload)
       yield put({ type: 'query' })
+      if (resp && resp.status === 200 && resp.message === 'OK') {
+        if (callback) callback(resp)
+      }
     },
     *delete({
       payload,
@@ -83,6 +87,18 @@ export default {
         },
       })
       yield put({ type: 'query' })
+    },
+    *singleInterfaceUpload({
+      payload,
+      callback,
+    }, { call }) {
+      // eslint-disable-next-line no-undef
+      const formData = new FormData()
+      const url = `${payload.url}&size=${payload.size}`
+
+      formData.append('chunk', payload.file)
+      yield call(uploadChunk, url, formData, {}, payload.onProgress, 0)
+      if (callback) callback()
     },
     *startWS({
       payload,

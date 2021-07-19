@@ -38,3 +38,20 @@ export async function deleteDisksOnBackingImage(params) {
     })
   }
 }
+
+export async function uploadChunk(url, params, headers, onProgress, i) {
+  return new Promise((resolve) => {
+    // eslint-disable-next-line no-undef
+    const xhr = new XMLHttpRequest()
+
+    xhr.open('post', url)
+    xhr.upload.onprogress = (e) => { onProgress(e, i + 1) }
+    Object.keys(headers).forEach(key => xhr.setRequestHeader(key, headers[key]))
+    xhr.send(params)
+    xhr.onload = e => {
+      resolve({
+        data: e.target.response,
+      })
+    }
+  })
+}

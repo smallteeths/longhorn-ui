@@ -90,6 +90,7 @@ const modal = ({
               },
             ],
           })(<Select defaultValue={'false'} onChange={selectChange}>
+            <Option value={'true'}>Upload From Local</Option>
             <Option value={'false'}>Download From URL</Option>
           </Select>)}
         </FormItem>

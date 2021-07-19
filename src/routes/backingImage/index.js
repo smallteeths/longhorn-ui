@@ -2,13 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { routerRedux } from 'dva/router'
 import { connect } from 'dva'
-import { Row, Col, Button } from 'antd'
+import { Row, Col, Button, Progress } from 'antd'
 import CreateBackingImage from './CreateBackingImage'
 import BackingImageList from './BackingImageList'
 import DiskStateMapDetail from './DiskStateMapDetail'
 import { Filter } from '../../components/index'
 import BackingImageBulkActions from './BackingImageBulkActions'
 import queryString from 'query-string'
+import style from './BackingImage.less'
 
 class BackingImage extends React.Component {
   constructor(props) {
@@ -32,9 +33,36 @@ class BackingImage extends React.Component {
     }
   }
 
+  uploadFile = (file, totalSize, record) => {
+    this.props.dispatch({
+      type: 'backingImage/singleInterfaceUpload',
+      payload: {
+        file,
+        size: totalSize,
+        url: record.actions.upload,
+        onProgress: (e) => {
+          console.log(e)
+          if (e.loaded) {
+            this.props.dispatch({
+              type: 'app/backingImageUploadProgress',
+              payload: {
+                backingImageuploadPercent: parseInt((e.loaded / totalSize) * 100, 10),
+              },
+            })
+          }
+        },
+      },
+      callback: () => {
+        // to do disabled loading
+      },
+    })
+  }
+
   render() {
     const { dispatch, loading, location } = this.props
+    const { uploadFile } = this
     const { data, selected, createBackingImageModalVisible, createBackingImageModalKey, diskStateMapDetailModalVisible, diskStateMapDetailModalKey, diskStateMapDeleteDisabled, diskStateMapDeleteLoading, selectedDiskStateMapRows, selectedDiskStateMapRowKeys, selectedRows } = this.props.backingImage
+    const { backingImageuploadPercent } = this.props.app
     const { field, value } = queryString.parse(this.props.location.search)
     let backingImages = data.filter((item) => {
       if (field && value) {
@@ -102,8 +130,13 @@ class BackingImage extends React.Component {
         dispatch({
           type: 'backingImage/create',
           payload: params,
-          callback: () => {
+          callback: (record) => {
             // to do upload
+            if (newBackingImage.fileContainer && newBackingImage.fileContainer && newBackingImage.fileContainer.file && newBackingImage.requireUpload) {
+              let file = newBackingImage.fileContainer.file.originFileObj
+              let totalSize = newBackingImage.fileContainer.file.originFileObj.size
+              uploadFile(file, totalSize, record)
+            }
           },
         })
       },
@@ -196,6 +229,8 @@ class BackingImage extends React.Component {
       },
     }
 
+    let inUploadProgress = backingImageuploadPercent > 0 && backingImageuploadPercent < 100
+
     return (
       <div className="content-inner" style={{ display: 'flex', flexDirection: 'column', overflow: 'visible !important' }}>
         <Row gutter={24} style={{ marginBottom: 16 }}>
@@ -206,7 +241,13 @@ class BackingImage extends React.Component {
             <Filter {...backingImageFilterProps} />
           </Col>
         </Row>
-        <Button style={{ position: 'absolute', top: '-50px', right: '0px' }} size="large" type="primary" onClick={addBackingImage}>Create Backing Image</Button>
+        { inUploadProgress ? <div className={style.backingImageUploadingContainer}>
+          <div>
+            <Progress percent={backingImageuploadPercent} />
+            <span>Uploading</span>
+          </div>
+        </div> : ''}
+        <Button style={{ position: 'absolute', top: '-50px', right: '0px' }} size="large" type="primary" disabled={inUploadProgress || loading} onClick={addBackingImage}>Create Backing Image</Button>
         <BackingImageList {...backingImageListProps} />
         { createBackingImageModalVisible ? <CreateBackingImage key={createBackingImageModalKey} {...createBackingImageModalProps} /> : ''}
         { diskStateMapDetailModalVisible ? <DiskStateMapDetail key={diskStateMapDetailModalKey} {...diskStateMapDetailModalProps} /> : ''}
@@ -216,10 +257,11 @@ class BackingImage extends React.Component {
 }
 
 BackingImage.propTypes = {
+  app: PropTypes.object,
   backingImage: PropTypes.object,
   loading: PropTypes.bool,
   location: PropTypes.object,
   dispatch: PropTypes.func,
 }
 
-export default connect(({ backingImage, loading }) => ({ backingImage, loading: loading.models.backingImage }))(BackingImage)
+export default connect(({ app, backingImage, loading }) => ({ app, backingImage, loading: loading.models.backingImage }))(BackingImage)
