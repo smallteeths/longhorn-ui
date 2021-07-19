@@ -79,7 +79,7 @@ class Replica extends React.Component {
       if (rebuildError) {
         return <div style={{ display: 'flex', justifyContent: 'flex-end', marginLeft: '20px' }}><Tooltip title={rebuildError}><Icon style={{ color: '#faad14' }} type="warning" /></Tooltip></div>
       } else {
-        return progress === 0 || progress === 100 ? '' : <Tooltip title={`${state === 'restore' ? 'Restoring' : 'Deleting Snapshot'} ${progress}%`}><Progress status={state === 'restore' ? 'success' : 'exception'} percent={progress} showInfo={false} /></Tooltip>
+        return progress === 0 || progress === 100 ? '' : <Tooltip title={`${state === 'restore' ? 'Restoring' : 'Deleteing Snapshot'} ${progress}%`}><Progress status={state === 'restore' ? 'success' : 'exception'} percent={progress} showInfo={false} /></Tooltip>
       }
     }
 

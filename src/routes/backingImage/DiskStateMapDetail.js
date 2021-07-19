@@ -1,9 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Table, Modal, Progress, Tooltip } from 'antd'
+import { Table, Modal, Progress, Tooltip, Card, Icon } from 'antd'
 import DiskStateMapActions from './DiskStateMapActions'
 import { ModalBlur, DropOption } from '../../components'
+import style from './BackingImage.less'
 const confirm = Modal.confirm
+
+// As the back-end field changes from diskStateMap to diskFileStatusMap
+// The data has been changed to be taken from diskFileStatusMap.
+// Many methods and components are named using the diskStateMap naming style, If changing this requires a lot of work.
+// So the naming of some components and methods have not been changed to diskFileStatusMap
 
 const modal = ({
   visible,
@@ -17,11 +23,15 @@ const modal = ({
   diskStateMapDeleteLoading,
 }) => {
   const modalOpts = {
-    title: 'Backing Image state in disks',
+    title: 'Check details & Operate files in disks',
     visible,
     onCancel,
     hasOnCancel: true,
     width: 680,
+    maxHeight: 800,
+    style: {
+      top: 0,
+    },
     okText: 'Close',
     footer: null,
     bodyStyle: { padding: '0px' },
@@ -46,12 +56,14 @@ const modal = ({
     return item.id === selected.id
   })
 
-  const dataSource = currentData && currentData.diskStateMap ? Object.keys(currentData.diskStateMap).map((key) => {
+  const dataSource = currentData && currentData.diskFileStatusMap ? Object.keys(currentData.diskFileStatusMap).map((key) => {
+    let diskFileStatusMap = currentData.diskFileStatusMap[key]
+
     return {
-      status: currentData.diskStateMap[key],
+      status: diskFileStatusMap.state,
+      message: diskFileStatusMap.message,
       disk: key,
-      downloading: currentData.diskStateMap[key] && currentData.downloadProgressMap && currentData.downloadProgressMap[key] !== 'undefined' && currentData.diskStateMap[key] === 'downloading',
-      progress: currentData.downloadProgressMap && currentData.downloadProgressMap[key] ? parseInt(currentData.downloadProgressMap[key], 10) : 0,
+      progress: currentData.diskFileStatusMap[key] && currentData.diskFileStatusMap[key].progress ? parseInt(currentData.diskFileStatusMap[key].progress, 10) : 0,
     }
   }) : []
 
@@ -65,8 +77,10 @@ const modal = ({
       render: (text, record) => {
         return (
           <div>
-            { record.downloading ? <Tooltip title={`${record.progress}%`}><div><Progress showInfo={false} percent={record.progress} /></div></Tooltip> : ''}
-            <div>{text}</div>
+            { text === 'in-progress' ? <Tooltip title={`${record.progress}%`}><div><Progress showInfo={false} percent={record.progress} /></div></Tooltip> : ''}
+            <Tooltip title={record.message}>
+              <div>{text} {record.message ? <Icon type="message" className="color-warning" /> : ''}</div>
+            </Tooltip>
           </div>
         )
       },
@@ -106,7 +120,32 @@ const modal = ({
 
   return (
     <ModalBlur {...modalOpts}>
-      <div style={{ width: '100%', overflow: 'auto', maxHeight: '500px', padding: '10px 20px 10px' }}>
+      <div style={{ width: '100%', overflow: 'auto', padding: '10px 20px 10px' }}>
+        <div className={style.backingImageModalContainer}>
+          <Card>
+            <div className={style.parametersContainer} style={{ marginBottom: 0 }}>
+              <div>Created From: </div>
+              <span>{currentData.sourceType === 'download' ? 'Download from URL' : currentData.sourceType.toUpperCase()}</span>
+              <div style={{ textAlign: 'left' }}>Parameters During Creation:</div>
+            </div>
+            <div style={{ width: '90%', marginLeft: 20 }}>
+              {currentData.parameters ? Object.keys(currentData.parameters).map((key) => {
+                return <div style={{ display: 'flex', padding: 5 }} key={key}>
+                  <div style={{ width: 60 }}>{key ? key.toUpperCase() : key }:</div>
+                  <div style={{ marginLeft: 10 }}>{currentData.parameters[key]}</div>
+                </div>
+              }) : ''}
+            </div>
+          </Card>
+          <Card>
+            <div className={style.parametersContainer}>
+              { currentData.expectedChecksum ? <div style={{ textAlign: 'left' }}>Expected SHA512 Checksum:</div> : '' }
+              { currentData.expectedChecksum ? <span>{currentData.expectedChecksum}</span> : '' }
+              <div style={{ textAlign: 'left' }}>Current SHA512 Checksum:</div>
+              <span>{currentData.currentChecksum ? currentData.currentChecksum : ''}</span>
+            </div>
+          </Card>
+        </div>
         <div style={{ marginBottom: 12 }}>
           <DiskStateMapActions {...diskStateMapProps} />
         </div>

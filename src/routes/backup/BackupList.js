@@ -115,7 +115,7 @@ class List extends React.Component {
           confirm({
             width: '800px',
             title: `Are you sure you want to delete backup ${record.name} ?`,
-            content: 'If there is backup restore process in progress using this backup (including DR volumes), deleting the backup will result in restore failure and volume in the restore process will become FAULTED. Are you sure you want to delete this backup?',
+            content: 'If there is backup restore process in progress using this backup (including DR volumes), deleteing the backup will result in restore failure and volume in the restore process will become FAULTED. Are you sure you want to delete this backup?',
             onOk() {
               deleteBackup(record)
             },
