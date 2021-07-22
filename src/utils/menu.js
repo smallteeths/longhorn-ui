@@ -50,7 +50,7 @@ module.exports = [
       },
       {
         show: true,
-        key: 'backingImage',
+        key: 'backingimage',
         name: 'Backing Image',
         icon: 'file-image',
       },

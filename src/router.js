@@ -87,7 +87,7 @@ const Routers = function ({ history, app }) {
             <Route path={`${path}backup/:id`} component={backupDetail} />
             <Route path={`${path}setting`} component={setting} />
             <Route exact path={`${path}engineimage`} component={engineimage} />
-            <Route exact path={`${path}backingImage`} component={backingImage} />
+            <Route exact path={`${path}backingimage`} component={backingImage} />
             <Route path={`${path}engineimage/:id`} component={engineimageDetail} />
             <Route component={notfound} />
           </Switch>

@@ -52,7 +52,7 @@ const dependency = {
     }],
   },
   backingImage: {
-    path: '/backingImage',
+    path: '/backingimage',
     runWs: [{
       ns: 'backingImage',
       key: 'backingimages',
