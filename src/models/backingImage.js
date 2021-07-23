@@ -12,6 +12,7 @@ export default {
     data: [],
     selected: {},
     selectedRows: [],
+    cleanUp: false,
     createBackingImageModalVisible: false,
     createBackingImageModalKey: Math.random(),
     diskStateMapDetailModalVisible: false,
@@ -179,10 +180,10 @@ export default {
       return { ...state, createBackingImageModalVisible: false }
     },
     showDiskStateMapDetailModal(state, action) {
-      return { ...state, selected: action.payload, diskStateMapDetailModalVisible: true, diskStateMapDetailModalKey: Math.random() }
+      return { ...state, selected: action.payload.record, cleanUp: action.payload.cleanUp, diskStateMapDetailModalVisible: true, diskStateMapDetailModalKey: Math.random() }
     },
     hideDiskStateMapDetailModal(state) {
-      return { ...state, diskStateMapDetailModalVisible: false, diskStateMapDetailModalKey: Math.random() }
+      return { ...state, diskStateMapDetailModalVisible: false, cleanUp: false, diskStateMapDetailModalKey: Math.random() }
     },
     disableDiskStateMapDelete(state) {
       return { ...state, diskStateMapDeleteDisabled: true }

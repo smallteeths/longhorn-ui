@@ -64,7 +64,7 @@ class BackingImage extends React.Component {
   render() {
     const { dispatch, loading, location } = this.props
     const { uploadFile } = this
-    const { data, selected, createBackingImageModalVisible, createBackingImageModalKey, diskStateMapDetailModalVisible, diskStateMapDetailModalKey, diskStateMapDeleteDisabled, diskStateMapDeleteLoading, selectedDiskStateMapRows, selectedDiskStateMapRowKeys, selectedRows } = this.props.backingImage
+    const { data, selected, createBackingImageModalVisible, createBackingImageModalKey, diskStateMapDetailModalVisible, diskStateMapDetailModalKey, diskStateMapDeleteDisabled, diskStateMapDeleteLoading, selectedDiskStateMapRows, selectedDiskStateMapRowKeys, selectedRows, cleanUp } = this.props.backingImage
     const { backingImageUploadPercent, backingImageUploadStarted } = this.props.app
     const { field, value } = queryString.parse(this.props.location.search)
     let backingImages = data.filter((item) => {
@@ -86,10 +86,16 @@ class BackingImage extends React.Component {
           payload: record,
         })
       },
+      cleanUpDiskMap(record) {
+        dispatch({
+          type: 'backingImage/showDiskStateMapDetailModal',
+          payload: { record, cleanUp: true },
+        })
+      },
       showDiskStateMapDetail(record) {
         dispatch({
           type: 'backingImage/showDiskStateMapDetailModal',
-          payload: record,
+          payload: { record, cleanUp: false },
         })
       },
       rowSelection: {
@@ -166,6 +172,7 @@ class BackingImage extends React.Component {
     const diskStateMapDetailModalProps = {
       selected,
       backingImages,
+      cleanUp,
       visible: diskStateMapDetailModalVisible,
       onCancel: () => {
         dispatch({ type: 'backingImage/hideDiskStateMapDetailModal' })

@@ -5,9 +5,10 @@ import BackingImageActions from './BackingImageActions'
 import { pagination } from '../../utils/page'
 import { formatMib } from '../../utils/formater'
 
-function list({ loading, dataSource, deleteBackingImage, showDiskStateMapDetail, rowSelection, height }) {
+function list({ loading, dataSource, deleteBackingImage, cleanUpDiskMap, showDiskStateMapDetail, rowSelection, height }) {
   const backingImageActionsProps = {
     deleteBackingImage,
+    cleanUpDiskMap,
   }
   const state = (record) => {
     if (record.deletionTimestamp) {
@@ -28,9 +29,8 @@ function list({ loading, dataSource, deleteBackingImage, showDiskStateMapDetail,
       width: 200,
       render: (text, record) => {
         return (
-          <div>
-            {text}
-            {state(record)}
+          <div onClick={() => { showDiskStateMapDetail(record) }} style={{ width: '100%', cursor: 'pointer' }}>
+            <Button type="link" block>{text}{state(record)}</Button>
           </div>
         )
       },
@@ -55,18 +55,6 @@ function list({ loading, dataSource, deleteBackingImage, showDiskStateMapDetail,
         return (
           <div>
             {text}
-          </div>
-        )
-      },
-    }, {
-      title: 'Check details & Operate files in disks',
-      dataIndex: 'diskStateMap',
-      key: 'diskStateMap',
-      width: 350,
-      render: (text, record) => {
-        return (
-          <div onClick={() => { showDiskStateMapDetail(record) }} style={{ width: '100%', cursor: 'pointer' }}>
-            <Button type="link" block>Detail</Button>
           </div>
         )
       },
@@ -105,6 +93,7 @@ list.propTypes = {
   dataSource: PropTypes.array,
   deleteBackingImage: PropTypes.func,
   showDiskStateMapDetail: PropTypes.func,
+  cleanUpDiskMap: PropTypes.func,
   rowSelection: PropTypes.object,
   height: PropTypes.number,
 }

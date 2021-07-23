@@ -21,9 +21,16 @@ const modal = ({
   rowSelection,
   diskStateMapDeleteDisabled,
   diskStateMapDeleteLoading,
+  // CleanUp is true if this popup is for a delete operation
+  cleanUp,
 }) => {
+  // update detail list
+  let currentData = backingImages.find((item) => {
+    return item.id === selected.id
+  })
+
   const modalOpts = {
-    title: 'Check details & Operate files in disks',
+    title: cleanUp ? 'Operate files in disks' : currentData.name,
     visible,
     onCancel,
     hasOnCancel: true,
@@ -50,11 +57,6 @@ const modal = ({
       default:
     }
   }
-
-  // update detail list
-  let currentData = backingImages.find((item) => {
-    return item.id === selected.id
-  })
 
   const dataSource = currentData && currentData.diskFileStatusMap ? Object.keys(currentData.diskFileStatusMap).map((key) => {
     let diskFileStatusMap = currentData.diskFileStatusMap[key]
@@ -93,7 +95,15 @@ const modal = ({
           <div>{text}</div>
         )
       },
-    }, {
+    },
+  ]
+
+  // If cleanUp is true tableRowSelection will equal props rowSelection, to support select rows.
+  let tableRowSelection = null
+
+  if (cleanUp) {
+    tableRowSelection = rowSelection
+    columns.push({
       title: 'Operation',
       key: 'operation',
       width: 100,
@@ -106,8 +116,8 @@ const modal = ({
           />
         )
       },
-    },
-  ]
+    })
+  }
 
   const diskStateMapProps = {
     selectedRows,
@@ -121,7 +131,7 @@ const modal = ({
   return (
     <ModalBlur {...modalOpts}>
       <div style={{ width: '100%', overflow: 'auto', padding: '10px 20px 10px' }}>
-        <div className={style.backingImageModalContainer}>
+        { !cleanUp ? <div className={style.backingImageModalContainer}>
           <Card>
             <div className={style.parametersContainer} style={{ marginBottom: 0 }}>
               <div>Created From: </div>
@@ -145,9 +155,9 @@ const modal = ({
               <span>{currentData.currentChecksum ? currentData.currentChecksum : ''}</span>
             </div>
           </Card>
-        </div>
+        </div> : ''}
         <div style={{ marginBottom: 12 }}>
-          <DiskStateMapActions {...diskStateMapProps} />
+          { cleanUp ? <DiskStateMapActions {...diskStateMapProps} /> : '' }
         </div>
         <Table
           bordered={false}
@@ -156,7 +166,7 @@ const modal = ({
           simple
           size="small"
           pagination={pagination}
-          rowSelection={rowSelection}
+          rowSelection={tableRowSelection}
           rowKey={record => record.disk}
         />
       </div>
@@ -166,6 +176,7 @@ const modal = ({
 
 modal.propTypes = {
   visible: PropTypes.bool,
+  cleanUp: PropTypes.bool,
   diskStateMapDeleteDisabled: PropTypes.bool,
   diskStateMapDeleteLoading: PropTypes.bool,
   selected: PropTypes.object,

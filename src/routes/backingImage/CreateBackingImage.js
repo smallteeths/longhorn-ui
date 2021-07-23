@@ -111,16 +111,6 @@ const modal = ({
             ],
           })(<Input disabled={disabled} />)}
         </FormItem>
-        <FormItem label="Expected Checksum" {...formItemLayout}>
-          {getFieldDecorator('expectedChecksum', {
-            initialValue: '',
-            rules: [
-              {
-                required: false,
-              },
-            ],
-          })(<Input placeholder="Ask Longhorn to validate the SHA512 checksum if it’s specified here." />)}
-        </FormItem>
         <FormItem label="File" {...formItemLayout} style={{ display: disabled ? 'block' : 'none' }}>
           {getFieldDecorator('fileContainer', {
             valuePropName: 'fileContainer',
@@ -154,6 +144,16 @@ const modal = ({
             </Button>
           </Upload>)}
           <span style={{ marginLeft: 10 }}>{ getFieldsValue().fileContainer && getFieldsValue().fileContainer.file ? getFieldsValue().fileContainer.file.name : ''}</span>
+        </FormItem>
+        <FormItem label="Expected Checksum" {...formItemLayout}>
+          {getFieldDecorator('expectedChecksum', {
+            initialValue: '',
+            rules: [
+              {
+                required: false,
+              },
+            ],
+          })(<Input placeholder="Ask Longhorn to validate the SHA512 checksum if it’s specified here." />)}
         </FormItem>
       </Form>
     </ModalBlur>
