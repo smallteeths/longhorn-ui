@@ -240,7 +240,7 @@ class Snapshots extends React.Component {
         return (
           <div style={{ position: 'absolute', top: 0, left: 0, background: 'rgba(255,255,255,.8)', width: '100%', height: '100%', zIndex: 20, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Tooltip placement="top" title={purgeStatus.statusErrorMsg}>
-              <Progress type="circle" format={percent => `Deleting ${percent}%`} strokeWidth={5} percent={purgeStatus.progress}></Progress>
+              <Progress type="circle" format={percent => `Deleteing ${percent}%`} strokeWidth={5} percent={purgeStatus.progress}></Progress>
             </Tooltip>
           </div>
         )

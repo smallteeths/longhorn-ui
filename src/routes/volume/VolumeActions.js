@@ -27,7 +27,7 @@ function actions({ selected, engineImages, showAttachHost, detach, showEngineUpg
     }
 
     return (<div>
-      {record.state === 'attached' ? <div>{`The volume is attached on ${record.controllers && record.controllers[0] && record.controllers[0].hostId ? record.controllers[0].hostId : ''}. Deleting this volume may cause errors for any running applications using this volume!`} </div> : ''}
+      {record.state === 'attached' ? <div>{`The volume is attached on ${record.controllers && record.controllers[0] && record.controllers[0].hostId ? record.controllers[0].hostId : ''}. Deleteing this volume may cause errors for any running applications using this volume!`} </div> : ''}
       {workloadResources ? <div> { `The following workload(s) depend on this volume (${record.name}) and may encounter errors once it is deleted:` }</div> : '' }
       {workloadResources}
       {hasPvTooltipText}
